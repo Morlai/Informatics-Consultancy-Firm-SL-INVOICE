@@ -1,1 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #INV-2026-0042</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary: #0b2545;
+            --accent: #1e4d8b;
+            --gradient: linear-gradient(135deg, #0b2545 0%, #1e4d8b 50%, #0b2545 100%);
+        }
+        [data-theme="green"] { --primary: #064e3b; --accent: #059669; --gradient: linear-gradient(135deg, #064e3b 0%, #059669 50%, #064e3b 100%); }
+        [data-theme="slate"] { --primary: #1e293b; --accent: #475569; --gradient: linear-gradient(135deg, #1e293b 0%, #475569 50%, #1e293b 100%); }
+        [data-theme="burgundy"] { --primary: #4c0519; --accent: #9f1239; --gradient: linear-gradient(135deg, #4c0519 0%, #9f1239 50%, #4c0519 100%); }
+        [data-theme="purple"] { --primary: #2e1065; --accent: #7c3aed; --gradient: linear-gradient(135deg, #2e1065 0%, #7c3aed 50%, #2e1065 100%); }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #eef2f7; color: #333; padding: 30px; line-height: 1.4; }
+        
+        .top-controls {
+            max-width: 210mm;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .theme-switcher { display: flex; gap: 10px; align-items: center; }
+        .theme-btn { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .theme-btn:hover { transform: scale(1.2); }
+        .theme-btn.active { border: 2px solid #333; transform: scale(1.1); }
+        .theme-btn[data-color="navy"] { background: #0b2545; }
+        .theme-btn[data-color="green"] { background: #064e3b; }
+        .theme-btn[data-color="slate"] { background: #1e293b; }
+        .theme-btn[data-color="burgundy"] { background: #4c0519; }
+        .theme-btn[data-color="purple"] { background: #2e1065; }
+
+        .right-controls { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+
+        .currency-switcher { display: flex; gap: 5px; }
+        .curr-btn { padding: 6px 12px; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+        .curr-btn:hover { background: #f0f0f0; }
+        .curr-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .action-bar { display: flex; gap: 12px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: inherit; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-download { background: var(--primary); color: white; }
+        .btn-share { background: var(--accent); color: white; }
+        .btn-print { background: #ffffff; color: var(--primary); border: 1px solid var(--primary); }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        
+        .invoice { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
+        .banner-wrapper { position: relative; background: var(--gradient); flex-shrink: 0; }
+        .banner-content { position: relative; z-index: 1; padding: 25px 30px 50px 30px; color: white; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+        .banner-left { flex: 1; }
+        .banner-right { flex-shrink: 0; text-align: right; }
+        .logo-section { display: flex; align-items: center; gap: 15px; }
+        .logo { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .logo img { width: 100%; height: 100%; object-fit: contain; }
+        .company-name h1 { font-size: 20px; font-weight: 700; letter-spacing: 1px; margin-bottom: 3px; white-space: nowrap; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .company-subtitle { font-size: 12px; color: white; font-weight: 500; text-shadow: 0 1px 2px rgba(0,0,0,0.3); display: block; margin-top: 2px; }
+        .company-details { margin-top: 10px; font-size: 11px; color: white; line-height: 1.5; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .company-details p { margin: 1px 0; }
+        .invoice-title { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+        .invoice-title h2 { font-size: 30px; letter-spacing: 3px; font-weight: 400; border-bottom: 2px solid rgba(255,255,255,0.8); display: inline-block; padding-bottom: 3px; margin: 0; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .invoice-number { font-size: 15px; font-weight: 500; letter-spacing: 1px; border-bottom: 2px solid rgba(255,255,255,0.6); padding-bottom: 3px; display: inline-block; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .wave-svg { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; display: block; }
+        .invoice-meta { display: flex; justify-content: space-between; padding: 20px 30px 15px 30px; border-bottom: 1px solid #e5e7eb; gap: 30px; margin-top: -10px; position: relative; z-index: 2; flex-shrink: 0; }
+        .meta-block h3 { font-size: 11px; text-transform: uppercase; color: #6b7280; letter-spacing: 1px; margin-bottom: 6px; font-weight: 600; }
+        .meta-block p { font-size: 13px; margin: 2px 0; }
+        [contenteditable="true"] { outline: none; border-radius: 3px; transition: background 0.2s; cursor: text; }
+        [contenteditable="true"]:hover { background: #f0f7ff; }
+        [contenteditable="true"]:focus { background: #e6f0fa; box-shadow: 0 0 0 2px var(--primary); }
+        .invoice-body { padding: 15px 30px; flex-grow: 1; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: var(--primary); }
+        th { text-align: left; padding: 10px 8px; font-size: 11px; text-transform: uppercase; color: #ffffff; letter-spacing: 0.8px; font-weight: 600; }
+        th:last-child { text-align: right; } th:nth-child(2) { text-align: center; } th:nth-child(3) { text-align: right; }
+        td { padding: 10px 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+        td .amount { font-weight: 600; color: var(--primary); }
+        .delete-btn { background: none; color: #ef4444; border: none; cursor: pointer; font-size: 14px; opacity: 0; transition: opacity 0.2s; padding: 0 5px; }
+        tr:hover .delete-btn { opacity: 1; }
+        .add-row-btn { background: none; color: var(--primary); border: 1px dashed var(--primary); padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-top: 10px; }
+        .totals { display: flex; justify-content: flex-end; margin-top: 15px; width: 100%; }
+        .totals-table { width: 300px; }
+        .totals-table .row { display: flex; justify-content: space-between; padding: 6px 10px; font-size: 13px; align-items: center; }
+        .totals-table .row.sub { border-bottom: 1px solid #e5e7eb; color: #4b5563; }
+        .totals-table .row.grand { background: var(--primary); color: #fff; font-size: 16px; font-weight: 600; margin-top: 6px; padding: 10px; border-radius: 4px; }
+        .invoice-footer { padding: 15px 30px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 30px; flex-shrink: 0; }
+        .notes, .payment { flex: 1; }
+        /* Added vertical divider between Notes and Payment */
+        .payment { border-left: 1px solid #d1d5db; padding-left: 25px; margin-left: 5px; }
+        .notes h4, .payment h4 { font-size: 12px; text-transform: uppercase; color: var(--primary); margin-bottom: 5px; letter-spacing: 1px; }
+        .notes p, .payment p { font-size: 12px; color: #4b5563; margin: 2px 0; }
+        .signature { text-align: center; margin-top: 15px; padding: 0 30px 10px; flex-shrink: 0; }
+        .signature-line { border-top: 1px solid #9ca3af; width: 200px; margin: 20px auto 4px; }
+        .signature p { font-size: 11px; color: #6b7280; }
+        .thank-you { text-align: center; padding: 12px; background: var(--primary); color: #fff; font-size: 13px; letter-spacing: 2px; flex-shrink: 0; }
+
+        /* =========================================
+           PRINT STYLES
+           ========================================= */
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+            html, body { width: 210mm; height: 297mm; margin: 0; padding: 0; background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+            body { padding: 0 !important; }
+            .top-controls { display: none !important; }
+            .invoice { width: 210mm; height: 297mm; margin: 0; padding: 0; box-shadow: none; page-break-inside: avoid; }
+            
+            .banner-wrapper { background: var(--primary) !important; background: var(--gradient) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .banner-content { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: flex-start !important; padding: 25px 30px 50px 30px !important; width: 100% !important; }
+            .banner-left { flex: 1 !important; max-width: 70% !important; }
+            .banner-right { flex: 0 0 auto !important; width: 250px !important; display: flex !important; flex-direction: column !important; align-items: flex-end !important; text-align: right !important; }
+            .logo-section { display: flex !important; flex-direction: row !important; align-items: center !important; }
+            
+            .company-name h1 { display: block !important; white-space: nowrap !important; color: #ffffff !important; text-shadow: none !important; font-size: 18px !important; margin-bottom: 2px !important; }
+            .company-subtitle { display: block !important; color: #ffffff !important; text-shadow: none !important; font-size: 12px !important; margin-top: 0 !important; }
+            
+            .banner-content *, .company-details, .company-details p, .invoice-title h2, .invoice-number { color: #ffffff !important; text-shadow: none !important; }
+            .company-details { margin-top: 10px !important; display: block !important; }
+            .company-details p { margin: 1px 0 !important; white-space: nowrap !important; font-size: 11px !important; }
+            .invoice-title { display: flex !important; flex-direction: column !important; align-items: flex-end !important; }
+
+            .invoice-meta { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: flex-start !important; width: 100% !important; }
+            .meta-block:first-child { flex: 1 !important; }
+            .meta-block:last-child { flex: 0 0 auto !important; margin-left: auto !important; text-align: left !important; max-width: 45% !important; }
+            .meta-block:last-child h3, .meta-block:last-child p { text-align: left !important; }
+
+            /* Print the footer divider */
+            .invoice-footer { display: flex !important; justify-content: space-between !important; background: #f9fafb !important; }
+            .payment { border-left: 1px solid #d1d5db !important; padding-left: 25px !important; margin-left: 5px !important; }
+
+            .wave-svg path { fill: #ffffff !important; }
+            .totals { display: flex !important; justify-content: flex-end !important; width: 100% !important; }
+            .totals-table { width: 300px !important; }
+            
+            thead { background: var(--primary) !important; }
+            th { color: #ffffff !important; }
+            .totals-table .row.grand { background: var(--primary) !important; color: #fff !important; }
+            .thank-you { background: var(--primary) !important; color: #fff !important; }
+            
+            [contenteditable="true"]:hover, [contenteditable="true"]:focus { background: transparent !important; box-shadow: none !important; }
+            .add-row-btn, .delete-btn { display: none !important; }
+        }
+        @media (max-width: 768px) {
+            .top-controls { justify-content: center; }
+            .invoice { width: 100%; height: auto; }
+            .banner-content { flex-direction: column; }
+            .banner-right { text-align: left; width: 100%; }
+            .invoice-title { align-items: flex-start; }
+            .logo-section { flex-direction: column; text-align: center; }
+            .company-name h1 { white-space: normal; text-align: center; }
+            .invoice-meta { flex-direction: column; gap: 15px; margin-top: 0; }
+            .invoice-body, .invoice-footer { padding: 15px; }
+            .payment { border-left: none !important; padding-left: 0 !important; margin-left: 0 !important; border-top: 1px solid #d1d5db; padding-top: 15px; margin-top: 15px; }
+            th, td { font-size: 11px; padding: 8px 4px; }
+            .totals { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Unified Top Control Bar -->
+<div class="top-controls">
+    <div class="theme-switcher">
+        <button class="theme-btn active" data-color="navy" onclick="setTheme('navy', this)" title="Navy Blue"></button>
+        <button class="theme-btn" data-color="green" onclick="setTheme('green', this)" title="Emerald Green"></button>
+        <button class="theme-btn" data-color="slate" onclick="setTheme('slate', this)" title="Charcoal Slate"></button>
+        <button class="theme-btn" data-color="burgundy" onclick="setTheme('burgundy', this)" title="Deep Burgundy"></button>
+        <button class="theme-btn" data-color="purple" onclick="setTheme('purple', this)" title="Royal Purple"></button>
+    </div>
+    <div class="right-controls">
+        <div class="currency-switcher">
+            <button class="curr-btn active" onclick="setCurrency('$', this)">$ USD</button>
+            <button class="curr-btn" onclick="setCurrency('Le ', this)">Le SLE</button>
+        </div>
+        <div class="action-bar">
+            <button class="btn btn-download" onclick="downloadPDF()"><span>📥</span> Download PDF</button>
+            <button class="btn btn-share" onclick="shareEmail()"><span>📧</span> Share via Email</button>
+            <button class="btn btn-print" onclick="printInvoice()"><span>🖨️</span> Print</button>
+        </div>
+    </div>
+</div>
+
+<div class="invoice" id="invoice-content">
+    <div class="banner-wrapper">
+        <div class="banner-content">
+            <div class="banner-left">
+                <div class="logo-section">
+                    <div class="logo"><img src="ICF-SL Logo.jpg" alt="ICF-SL Logo"></div>
+                    <div class="company-name">
+                        <h1>INFORMATICS CONSULTANCY FIRM</h1>
+                        <span class="company-subtitle">Sierra Leone • Freetown</span>
+                    </div>
+                </div>
+                <div class="company-details">
+                    <p contenteditable="true">15 Siaka Stevens Street</p>
+                    <p contenteditable="true">Freetown, Sierra Leone</p>
+                    <p contenteditable="true">info@informaticsconsult.sl | +232 76 123 456</p>
+                    <p contenteditable="true">NAT Registration: 100123456-7</p>
+                </div>
+            </div>
+            <div class="banner-right">
+                <div class="invoice-title">
+                    <h2>INVOICE</h2>
+                    <span class="invoice-number" contenteditable="true">#INV-2026-0042</span>
+                </div>
+            </div>
+        </div>
+        <svg class="wave-svg" viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,60 C240,20 480,100 720,80 C960,60 1200,40 1440,70 L1440,120 L0,120 Z" fill="#ffffff"/>
+        </svg>
+    </div>
+
+    <div class="invoice-meta">
+        <div class="meta-block">
+            <h3>Bill To</h3>
+            <p contenteditable="true" style="font-weight: bold;">Global Tech Industries Inc.</p>
+            <p contenteditable="true">Attn: Accounts Payable</p>
+            <p contenteditable="true">456 Innovation Drive</p>
+            <p contenteditable="true">San Francisco, CA 94107</p>
+            <p contenteditable="true">billing@globaltech.io</p>
+        </div>
+        <div class="meta-block">
+            <h3>Invoice Details</h3>
+            <p><strong>Issue Date:</strong> <span contenteditable="true">July 02, 2026</span></p>
+            <p><strong>Due Date:</strong> <span contenteditable="true">August 01, 2026</span></p>
+            <p><strong>PO Number:</strong> <span contenteditable="true">PO-2026-1187</span></p>
+            <p><strong>Project:</strong> <span contenteditable="true">Website Redesign</span></p>
+        </div>
+    </div>
+
+    <div class="invoice-body">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:45%">Description</th>
+                    <th style="width:15%">Qty</th>
+                    <th style="width:20%">Unit Price</th>
+                    <th style="width:15%">Amount</th>
+                    <th style="width:5%"></th>
+                </tr>
+            </thead>
+            <tbody id="invoiceItems">
+                <tr>
+                    <td contenteditable="true">Hosting</td>
+                    <td contenteditable="true" class="qty">1</td>
+                    <td contenteditable="true" class="price">150.00</td>
+                    <td class="amount">$150.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true">Domain</td>
+                    <td contenteditable="true" class="qty">1</td>
+                    <td contenteditable="true" class="price">25.00</td>
+                    <td class="amount">$25.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true">Security</td>
+                    <td contenteditable="true" class="qty">1</td>
+                    <td contenteditable="true" class="price">120.00</td>
+                    <td class="amount">$120.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true">Plugins</td>
+                    <td contenteditable="true" class="qty">5</td>
+                    <td contenteditable="true" class="price">45.00</td>
+                    <td class="amount">$225.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+                </tr>
+                <tr>
+                    <td contenteditable="true">Development Fees</td>
+                    <td contenteditable="true" class="qty">40</td>
+                    <td contenteditable="true" class="price">95.00</td>
+                    <td class="amount">$3,800.00</td>
+                    <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="add-row-btn" onclick="addRow()">+ Add Item</button>
+
+        <div class="totals">
+            <div class="totals-table">
+                <div class="row sub"><span>Subtotal</span><span id="subtotal">$4,320.00</span></div>
+                <div class="row sub"><span>Discount (<span contenteditable="true" id="discountRate">5</span>%)</span><span id="discount">-$216.00</span></div>
+                <div class="row sub"><span>Tax (<span contenteditable="true" id="taxRate">8</span>%)</span><span id="tax">$328.32</span></div>
+                <div class="row grand"><span>Total Due</span><span id="total">$4,432.32</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="invoice-footer">
+        <div class="notes">
+            <h4>Notes</h4>
+            <p contenteditable="true">Thank you for your business!</p>
+            <p contenteditable="true">Please include the invoice number on your payment reference.</p>
+            <p contenteditable="true">Late payments are subject to a 1.5% monthly fee.</p>
+        </div>
+        <div class="payment">
+            <h4>Payment Information</h4>
+            <p><strong>Bank:</strong> <span contenteditable="true">Rokel Commercial Bank</span></p>
+            <p><strong>Account Name:</strong> <span contenteditable="true">Informatics Consultancy Firm SL</span></p>
+            <p><strong>Account No:</strong> <span contenteditable="true">01-01-200-1234567-01</span></p>
+            <p><strong>Branch:</strong> <span contenteditable="true">Siaka Stevens St, Freetown</span></p>
+            <p><strong>SWIFT:</strong> <span contenteditable="true">ROCOSLFR</span></p>
+            <br>
+            <p><strong>Mobile Money:</strong> <span contenteditable="true">Orange Money</span></p>
+            <p><strong>Name:</strong> <span contenteditable="true">IShaka Sheriff</span></p>
+            <p><strong>Number:</strong> <span contenteditable="true">+232114224</span></p>
+        </div>
+    </div>
+
+    <div class="signature">
+        <div class="signature-line"></div>
+        <p>Authorized Signature</p>
+    </div>
+
+    <div class="thank-you">THANK YOU FOR YOUR BUSINESS</div>
+</div>
+
+<script>
+    function setTheme(themeName, btnElement) {
+        if (themeName === 'navy') { document.documentElement.removeAttribute('data-theme'); } 
+        else { document.documentElement.setAttribute('data-theme', themeName); }
+        document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+
+    let currentCurrency = '$';
+    function setCurrency(symbol, btnElement) {
+        currentCurrency = symbol;
+        document.querySelectorAll('.curr-btn').forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+        calculateTotals();
+    }
+
+    function downloadPDF() {
+        const element = document.getElementById('invoice-content');
+        const invoiceNum = document.querySelector('.invoice-number').innerText.replace(/[^a-zA-Z0-9]/g, '');
+        const deleteBtns = document.querySelectorAll('.delete-btn');
+        const addBtn = document.querySelector('.add-row-btn');
+        deleteBtns.forEach(btn => btn.style.display = 'none');
+        if(addBtn) addBtn.style.display = 'none';
+        const opt = {
+            margin: 0, filename: `Invoice-${invoiceNum}.pdf`, image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff' },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+        html2pdf().set(opt).from(element).save().then(() => {
+            deleteBtns.forEach(btn => btn.style.display = ''); if(addBtn) addBtn.style.display = '';
+        }).catch(err => {
+            console.error('PDF generation failed:', err);
+            alert('PDF download failed. Please ensure you are running this file on a local server.');
+            deleteBtns.forEach(btn => btn.style.display = ''); if(addBtn) addBtn.style.display = '';
+        });
+    }
+
+    function shareEmail() {
+        const invoiceNum = document.querySelector('.invoice-number').innerText;
+        const totalDue = document.getElementById('total').innerText;
+        const dueDate = document.querySelector('.meta-block:last-child p:nth-child(2) span').innerText;
+        const subject = encodeURIComponent(`Invoice ${invoiceNum} from Informatics Consultancy Firm`);
+        const body = encodeURIComponent(`Hello,\n\nPlease find the invoice details below:\n\nInvoice Number: ${invoiceNum}\nDue Date: ${dueDate}\nTotal Amount Due: ${totalDue}\n\nPlease let me know if you have any questions.\n\nBest regards,\nInformatics Consultancy Firm SL`);
+        window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    }
+
+    function printInvoice() {
+        const deleteBtns = document.querySelectorAll('.delete-btn');
+        const addBtn = document.querySelector('.add-row-btn');
+        deleteBtns.forEach(btn => btn.style.display = 'none');
+        if(addBtn) addBtn.style.display = 'none';
+        document.body.style.display = 'none'; document.body.offsetHeight; document.body.style.display = '';
+        window.print();
+        setTimeout(() => { deleteBtns.forEach(btn => btn.style.display = ''); if(addBtn) addBtn.style.display = ''; }, 500);
+    }
+
+    function formatCurrency(amount) { return currentCurrency + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
+    function parseNumber(text) { return parseFloat(String(text).replace(/[^0-9.-]+/g, "")) || 0; }
+    function calculateRow(row) {
+        const qty = parseNumber(row.querySelector('.qty').innerText);
+        const price = parseNumber(row.querySelector('.price').innerText);
+        const amount = qty * price;
+        row.querySelector('.amount').innerText = formatCurrency(amount);
+        return amount;
+    }
+    function calculateTotals() {
+        const rows = document.querySelectorAll('#invoiceItems tr');
+        let subtotal = 0;
+        rows.forEach(row => { subtotal += calculateRow(row); });
+        const discountRate = parseNumber(document.getElementById('discountRate').innerText);
+        const taxRate = parseNumber(document.getElementById('taxRate').innerText);
+        const discount = subtotal * (discountRate / 100);
+        const afterDiscount = subtotal - discount;
+        const tax = afterDiscount * (taxRate / 100);
+        const total = afterDiscount + tax;
+        document.getElementById('subtotal').innerText = formatCurrency(subtotal);
+        document.getElementById('discount').innerText = '-' + formatCurrency(discount);
+        document.getElementById('tax').innerText = formatCurrency(tax);
+        document.getElementById('total').innerText = formatCurrency(total);
+    }
+    function addRow() {
+        const tbody = document.getElementById('invoiceItems');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `<td contenteditable="true">New Item</td><td contenteditable="true" class="qty">1</td><td contenteditable="true" class="price">0.00</td><td class="amount">${formatCurrency(0)}</td><td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>`;
+        tbody.appendChild(newRow); calculateTotals();
+    }
+    function deleteRow(btn) { const row = btn.closest('tr'); row.remove(); calculateTotals(); }
+
+    document.getElementById('invoiceItems').addEventListener('input', calculateTotals);
+    document.getElementById('discountRate').addEventListener('input', calculateTotals);
+    document.getElementById('taxRate').addEventListener('input', calculateTotals);
+    document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+        el.addEventListener('paste', (e) => { e.preventDefault(); const text = (e.originalEvent || e).clipboardData.getData('text/plain'); document.execCommand('insertText', false, text); });
+    });
+    calculateTotals();
+</script>
+</body>
+</html>
