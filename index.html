@@ -94,7 +94,6 @@
         .totals-table .row.grand { background: var(--primary); color: #fff; font-size: 16px; font-weight: 600; margin-top: 6px; padding: 10px; border-radius: 4px; }
         .invoice-footer { padding: 15px 30px; background: #f9fafb; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; gap: 30px; flex-shrink: 0; }
         .notes, .payment { flex: 1; }
-        /* Added vertical divider between Notes and Payment */
         .payment { border-left: 1px solid #d1d5db; padding-left: 25px; margin-left: 5px; }
         .notes h4, .payment h4 { font-size: 12px; text-transform: uppercase; color: var(--primary); margin-bottom: 5px; letter-spacing: 1px; }
         .notes p, .payment p { font-size: 12px; color: #4b5563; margin: 2px 0; }
@@ -103,48 +102,36 @@
         .signature p { font-size: 11px; color: #6b7280; }
         .thank-you { text-align: center; padding: 12px; background: var(--primary); color: #fff; font-size: 13px; letter-spacing: 2px; flex-shrink: 0; }
 
-        /* =========================================
-           PRINT STYLES
-           ========================================= */
         @page { size: A4 portrait; margin: 0; }
         @media print {
             html, body { width: 210mm; height: 297mm; margin: 0; padding: 0; background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
             body { padding: 0 !important; }
             .top-controls { display: none !important; }
             .invoice { width: 210mm; height: 297mm; margin: 0; padding: 0; box-shadow: none; page-break-inside: avoid; }
-            
             .banner-wrapper { background: var(--primary) !important; background: var(--gradient) !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .banner-content { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: flex-start !important; padding: 25px 30px 50px 30px !important; width: 100% !important; }
             .banner-left { flex: 1 !important; max-width: 70% !important; }
             .banner-right { flex: 0 0 auto !important; width: 250px !important; display: flex !important; flex-direction: column !important; align-items: flex-end !important; text-align: right !important; }
             .logo-section { display: flex !important; flex-direction: row !important; align-items: center !important; }
-            
             .company-name h1 { display: block !important; white-space: nowrap !important; color: #ffffff !important; text-shadow: none !important; font-size: 18px !important; margin-bottom: 2px !important; }
             .company-subtitle { display: block !important; color: #ffffff !important; text-shadow: none !important; font-size: 12px !important; margin-top: 0 !important; }
-            
             .banner-content *, .company-details, .company-details p, .invoice-title h2, .invoice-number { color: #ffffff !important; text-shadow: none !important; }
             .company-details { margin-top: 10px !important; display: block !important; }
             .company-details p { margin: 1px 0 !important; white-space: nowrap !important; font-size: 11px !important; }
             .invoice-title { display: flex !important; flex-direction: column !important; align-items: flex-end !important; }
-
             .invoice-meta { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: flex-start !important; width: 100% !important; }
             .meta-block:first-child { flex: 1 !important; }
             .meta-block:last-child { flex: 0 0 auto !important; margin-left: auto !important; text-align: left !important; max-width: 45% !important; }
             .meta-block:last-child h3, .meta-block:last-child p { text-align: left !important; }
-
-            /* Print the footer divider */
             .invoice-footer { display: flex !important; justify-content: space-between !important; background: #f9fafb !important; }
             .payment { border-left: 1px solid #d1d5db !important; padding-left: 25px !important; margin-left: 5px !important; }
-
             .wave-svg path { fill: #ffffff !important; }
             .totals { display: flex !important; justify-content: flex-end !important; width: 100% !important; }
             .totals-table { width: 300px !important; }
-            
             thead { background: var(--primary) !important; }
             th { color: #ffffff !important; }
             .totals-table .row.grand { background: var(--primary) !important; color: #fff !important; }
             .thank-you { background: var(--primary) !important; color: #fff !important; }
-            
             [contenteditable="true"]:hover, [contenteditable="true"]:focus { background: transparent !important; box-shadow: none !important; }
             .add-row-btn, .delete-btn { display: none !important; }
         }
@@ -166,7 +153,6 @@
 </head>
 <body>
 
-<!-- Unified Top Control Bar -->
 <div class="top-controls">
     <div class="theme-switcher">
         <button class="theme-btn active" data-color="navy" onclick="setTheme('navy', this)" title="Navy Blue"></button>
@@ -251,35 +237,35 @@
                 <tr>
                     <td contenteditable="true">Hosting</td>
                     <td contenteditable="true" class="qty">1</td>
-                    <td contenteditable="true" class="price">119.88</td>
+                    <td contenteditable="true" class="price" data-usd-price="119.88">119.88</td>
                     <td class="amount">$119.88</td>
                     <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
                 </tr>
                 <tr>
                     <td contenteditable="true">Domain</td>
                     <td contenteditable="true" class="qty">1</td>
-                    <td contenteditable="true" class="price">9.99</td>
+                    <td contenteditable="true" class="price" data-usd-price="9.99">9.99</td>
                     <td class="amount">$9.99</td>
                     <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
                 </tr>
                 <tr>
                     <td contenteditable="true">Security</td>
                     <td contenteditable="true" class="qty">1</td>
-                    <td contenteditable="true" class="price">35.88</td>
+                    <td contenteditable="true" class="price" data-usd-price="35.88">35.88</td>
                     <td class="amount">$35.88</td>
                     <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
                 </tr>
                 <tr>
                     <td contenteditable="true">Plugins</td>
                     <td contenteditable="true" class="qty">5</td>
-                    <td contenteditable="true" class="price">49.00</td>
+                    <td contenteditable="true" class="price" data-usd-price="49.00">49.00</td>
                     <td class="amount">$49.00</td>
                     <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
                 </tr>
                 <tr>
                     <td contenteditable="true">Development Fees</td>
                     <td contenteditable="true" class="qty">40</td>
-                    <td contenteditable="true" class="price">95.00</td>
+                    <td contenteditable="true" class="price" data-usd-price="95.00">95.00</td>
                     <td class="amount">$3,800.00</td>
                     <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
                 </tr>
@@ -335,10 +321,46 @@
     }
 
     let currentCurrency = '$';
+    let exchangeRate = 24.5; // Fallback rate: 1 USD to SLE
+
+    // Fetch live exchange rate on load
+    function initializeExchangeRate() {
+        fetch('https://open.er-api.com/v6/latest/USD')
+            .then(res => res.json())
+            .then(data => {
+                if (data.rates && data.rates.SLE) {
+                    exchangeRate = data.rates.SLE;
+                }
+                // Initialize base USD prices for existing rows
+                document.querySelectorAll('.price').forEach(el => {
+                    el.dataset.usdPrice = parseNumber(el.innerText).toString();
+                });
+                calculateTotals();
+            })
+            .catch(err => {
+                console.warn("Failed to fetch live exchange rate, using fallback:", err);
+                document.querySelectorAll('.price').forEach(el => {
+                    el.dataset.usdPrice = parseNumber(el.innerText).toString();
+                });
+                calculateTotals();
+            });
+    }
+
     function setCurrency(symbol, btnElement) {
         currentCurrency = symbol;
         document.querySelectorAll('.curr-btn').forEach(btn => btn.classList.remove('active'));
         btnElement.classList.add('active');
+        
+        // Update all price cells based on the new currency using stored base USD price
+        document.querySelectorAll('.price').forEach(el => {
+            const usdPrice = parseFloat(el.dataset.usdPrice) || 0;
+            if (currentCurrency === 'Le ') {
+                el.innerText = (usdPrice * exchangeRate).toFixed(2);
+            } else {
+                el.innerText = usdPrice.toFixed(2);
+            }
+        });
+        
         calculateTotals();
     }
 
@@ -382,45 +404,92 @@
         setTimeout(() => { deleteBtns.forEach(btn => btn.style.display = ''); if(addBtn) addBtn.style.display = ''; }, 500);
     }
 
-    function formatCurrency(amount) { return currentCurrency + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); }
-    function parseNumber(text) { return parseFloat(String(text).replace(/[^0-9.-]+/g, "")) || 0; }
+    function formatCurrency(amount) { 
+        return currentCurrency + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'); 
+    }
+    
+    function parseNumber(text) { 
+        return parseFloat(String(text).replace(/[^0-9.-]+/g, "")) || 0; 
+    }
+    
     function calculateRow(row) {
         const qty = parseNumber(row.querySelector('.qty').innerText);
-        const price = parseNumber(row.querySelector('.price').innerText);
-        const amount = qty * price;
+        // Always calculate from the base USD price to prevent compounding rounding errors
+        const usdPrice = parseFloat(row.querySelector('.price').dataset.usdPrice) || 0;
+        const currentPrice = currentCurrency === 'Le ' ? usdPrice * exchangeRate : usdPrice;
+        const amount = qty * currentPrice;
         row.querySelector('.amount').innerText = formatCurrency(amount);
         return amount;
     }
+    
     function calculateTotals() {
         const rows = document.querySelectorAll('#invoiceItems tr');
         let subtotal = 0;
         rows.forEach(row => { subtotal += calculateRow(row); });
+        
         const discountRate = parseNumber(document.getElementById('discountRate').innerText);
         const taxRate = parseNumber(document.getElementById('taxRate').innerText);
+        
         const discount = subtotal * (discountRate / 100);
         const afterDiscount = subtotal - discount;
         const tax = afterDiscount * (taxRate / 100);
         const total = afterDiscount + tax;
+        
         document.getElementById('subtotal').innerText = formatCurrency(subtotal);
         document.getElementById('discount').innerText = '-' + formatCurrency(discount);
         document.getElementById('tax').innerText = formatCurrency(tax);
         document.getElementById('total').innerText = formatCurrency(total);
     }
+    
     function addRow() {
         const tbody = document.getElementById('invoiceItems');
         const newRow = document.createElement('tr');
-        newRow.innerHTML = `<td contenteditable="true">New Item</td><td contenteditable="true" class="qty">1</td><td contenteditable="true" class="price">0.00</td><td class="amount">${formatCurrency(0)}</td><td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>`;
-        tbody.appendChild(newRow); calculateTotals();
+        const defaultUsdPrice = 0;
+        const displayPrice = currentCurrency === 'Le ' ? (defaultUsdPrice * exchangeRate).toFixed(2) : defaultUsdPrice.toFixed(2);
+        
+        newRow.innerHTML = `
+            <td contenteditable="true">New Item</td>
+            <td contenteditable="true" class="qty">1</td>
+            <td contenteditable="true" class="price" data-usd-price="${defaultUsdPrice}">${displayPrice}</td>
+            <td class="amount">${formatCurrency(0)}</td>
+            <td><button class="delete-btn" onclick="deleteRow(this)">×</button></td>
+        `;
+        tbody.appendChild(newRow); 
+        calculateTotals();
     }
-    function deleteRow(btn) { const row = btn.closest('tr'); row.remove(); calculateTotals(); }
+    
+    function deleteRow(btn) { 
+        const row = btn.closest('tr'); 
+        row.remove(); 
+        calculateTotals(); 
+    }
 
-    document.getElementById('invoiceItems').addEventListener('input', calculateTotals);
+    // Enhanced input listener to update base USD price when user edits a price cell
+    document.getElementById('invoiceItems').addEventListener('input', function(e) {
+        if (e.target.classList.contains('price')) {
+            const newVal = parseNumber(e.target.innerText);
+            if (currentCurrency === 'Le ') {
+                e.target.dataset.usdPrice = (newVal / exchangeRate).toString();
+            } else {
+                e.target.dataset.usdPrice = newVal.toString();
+            }
+        }
+        calculateTotals();
+    });
+
     document.getElementById('discountRate').addEventListener('input', calculateTotals);
     document.getElementById('taxRate').addEventListener('input', calculateTotals);
+    
     document.querySelectorAll('[contenteditable="true"]').forEach(el => {
-        el.addEventListener('paste', (e) => { e.preventDefault(); const text = (e.originalEvent || e).clipboardData.getData('text/plain'); document.execCommand('insertText', false, text); });
+        el.addEventListener('paste', (e) => { 
+            e.preventDefault(); 
+            const text = (e.originalEvent || e).clipboardData.getData('text/plain'); 
+            document.execCommand('insertText', false, text); 
+        });
     });
-    calculateTotals();
+
+    // Initialize exchange rate and totals on page load
+    initializeExchangeRate();
 </script>
 </body>
 </html>
