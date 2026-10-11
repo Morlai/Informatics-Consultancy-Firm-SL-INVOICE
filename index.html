@@ -22,7 +22,7 @@
                 };
                 fallbackScript.onerror = function() {
                     console.error('All CDNs failed to load html2pdf');
-                    document.getElementById('pdf-status').textContent = '️ PDF library unavailable';
+                    document.getElementById('pdf-status').textContent = '⚠️ PDF library unavailable';
                     document.getElementById('pdf-status').style.color = '#ef4444';
                 };
                 document.head.appendChild(fallbackScript);
@@ -99,12 +99,9 @@
         
         .invoice { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
         
-        /* CRITICAL: Class to completely strip shadow for PDF capture */
         .invoice.pdf-capture {
             box-shadow: none !important;
             margin: 0 !important;
-            border: none !important;
-            outline: none !important;
         }
         
         .banner-wrapper { position: relative; background: var(--gradient); flex-shrink: 0; }
@@ -221,7 +218,7 @@
             <button class="btn btn-download" id="download-btn" onclick="downloadPDF()" disabled style="opacity: 0.5; cursor: not-allowed;">
                 <span>📥</span> Download PDF
             </button>
-            <button class="btn btn-share" onclick="shareEmail()"><span>📧</span> Share via Email</button>
+            <button class="btn btn-share" onclick="shareEmail()"><span></span> Share via Email</button>
             <button class="btn btn-print" onclick="printInvoice()"><span>🖨️</span> Print</button>
             <span class="pdf-status" id="pdf-status">⏳ Loading PDF engine...</span>
         </div>
@@ -431,49 +428,48 @@
         deleteBtns.forEach(btn => btn.style.display = 'none');
         if(addBtn) addBtn.style.display = 'none';
         
-        // CRITICAL FIX: Add the pdf-capture class which uses !important to strip shadow
+        // Add pdf-capture class to remove shadow
         element.classList.add('pdf-capture');
         
         const originalBtnText = downloadBtn.innerHTML;
-        downloadBtn.innerHTML = '<span>⏳</span> Generating...';
+        downloadBtn.innerHTML = '<span></span> Generating...';
         downloadBtn.disabled = true;
 
-        // Wait for the browser to apply the class before capturing
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                const opt = {
-                    margin: 0,
-                    filename: `Invoice-${invoiceNum}.pdf`,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2, 
-                        useCORS: true, 
-                        allowTaint: true, 
-                        logging: false, 
-                        backgroundColor: '#ffffff',
-                        // Prevent html2canvas from adding its own shadow/outline
-                        windowWidth: element.scrollWidth,
-                        windowHeight: element.scrollHeight
-                    },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-                };
+        // Wait for browser to apply styles
+        setTimeout(() => {
+            const opt = {
+                margin: 0,
+                filename: `Invoice-${invoiceNum}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    allowTaint: true, 
+                    logging: false, 
+                    backgroundColor: '#ffffff',
+                    // CRITICAL: Capture from the element's actual position
+                    x: 0,
+                    y: 0,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+            };
 
-                html2pdf().set(opt).from(element).save().then(() => {
-                    console.log('PDF generated successfully');
-                }).catch(err => {
-                    console.error('PDF generation failed:', err);
-                    alert('PDF generation failed. Please try again or use the Print button and save as PDF from your browser.');
-                }).finally(() => {
-                    // Remove the capture class to restore shadow
-                    element.classList.remove('pdf-capture');
-                    deleteBtns.forEach(btn => btn.style.display = '');
-                    if(addBtn) addBtn.style.display = '';
-                    downloadBtn.innerHTML = originalBtnText;
-                    downloadBtn.disabled = false;
-                });
+            html2pdf().set(opt).from(element).save().then(() => {
+                console.log('PDF generated successfully');
+            }).catch(err => {
+                console.error('PDF generation failed:', err);
+                alert('PDF generation failed. Please try again or use the Print button and save as PDF from your browser.');
+            }).finally(() => {
+                element.classList.remove('pdf-capture');
+                deleteBtns.forEach(btn => btn.style.display = '');
+                if(addBtn) addBtn.style.display = '';
+                downloadBtn.innerHTML = originalBtnText;
+                downloadBtn.disabled = false;
             });
-        });
+        }, 100);
     }
 
     function shareEmail() {
