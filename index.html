@@ -22,7 +22,7 @@
                 };
                 fallbackScript.onerror = function() {
                     console.error('All CDNs failed to load html2pdf');
-                    document.getElementById('pdf-status').textContent = '️ PDF library unavailable';
+                    document.getElementById('pdf-status').textContent = '⚠️ PDF library unavailable';
                     document.getElementById('pdf-status').style.color = '#ef4444';
                 };
                 document.head.appendChild(fallbackScript);
@@ -99,19 +99,21 @@
         
         .invoice { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
         
-        /* CRITICAL FIX: Completely strip all shadows, borders, and overflow clipping during PDF capture to prevent bottom edge artifacts */
-        .invoice.pdf-capture {
+        /* AGGRESSIVE FIX: Remove ALL shadows, borders, and add white buffer */
+        .invoice.pdf-capture,
+        .invoice.pdf-capture * {
             box-shadow: none !important;
+            text-shadow: none !important;
+        }
+        .invoice.pdf-capture {
             margin: 0 !important;
             border: none !important;
             outline: none !important;
             overflow: visible !important;
-            background: #ffffff !important;
-            padding-bottom: 1px !important; /* 1px white buffer to prevent html2canvas edge clipping artifact */
         }
+        /* Add white bottom border to thank-you to prevent black line artifact */
         .invoice.pdf-capture .thank-you {
-            box-shadow: none !important;
-            border: none !important;
+            border-bottom: 2px solid #ffffff !important;
             margin-bottom: 0 !important;
         }
         
@@ -227,7 +229,7 @@
         </div>
         <div class="action-bar">
             <button class="btn btn-download" id="download-btn" onclick="downloadPDF()" disabled style="opacity: 0.5; cursor: not-allowed;">
-                <span></span> Download PDF
+                <span>📥</span> Download PDF
             </button>
             <button class="btn btn-share" onclick="shareEmail()"><span>📧</span> Share via Email</button>
             <button class="btn btn-print" onclick="printInvoice()"><span>🖨️</span> Print</button>
@@ -438,7 +440,6 @@
         deleteBtns.forEach(btn => btn.style.display = 'none');
         if(addBtn) addBtn.style.display = 'none';
         
-        // Apply the strict PDF capture class
         element.classList.add('pdf-capture');
         
         const originalBtnText = downloadBtn.innerHTML;
