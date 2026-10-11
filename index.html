@@ -54,6 +54,7 @@
         .btn-share { background: var(--accent); color: white; }
         .btn-print { background: #ffffff; color: var(--primary); border: 1px solid var(--primary); }
         .btn:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         
         .invoice { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
         .banner-wrapper { position: relative; background: var(--gradient); flex-shrink: 0; }
@@ -179,7 +180,10 @@
         <div class="banner-content">
             <div class="banner-left">
                 <div class="logo-section">
-                    <div class="logo"><img src="ICF-SL Logo.jpg" alt="ICF-SL Logo"></div>
+                    <div class="logo">
+                        <!-- Added crossorigin="anonymous" to help prevent CORS blocking during PDF generation -->
+                        <img src="ICF-SL Logo.jpg" alt="ICF-SL Logo" crossorigin="anonymous">
+                    </div>
                     <div class="company-name">
                         <h1>INFORMATICS CONSULTANCY FIRM</h1>
                         <span class="company-subtitle">Sierra Leone • Freetown</span>
@@ -363,30 +367,39 @@
 
     function downloadPDF() {
         const element = document.getElementById('invoice-content');
-        const invoiceNum = document.querySelector('.invoice-number').innerText.replace(/[^a-zA-Z0-9]/g, '');
+        const invoiceNum = document.querySelector('.invoice-number').innerText.replace(/[^a-zA-Z0-9]/g, '') || 'Invoice';
         const deleteBtns = document.querySelectorAll('.delete-btn');
         const addBtn = document.querySelector('.add-row-btn');
+        const downloadBtn = document.querySelector('.btn-download');
         
-        // Hide interactive elements for a clean PDF
+        // 1. Prepare UI
         deleteBtns.forEach(btn => btn.style.display = 'none');
         if(addBtn) addBtn.style.display = 'none';
         
-        // Temporarily remove shadow for cleaner capture
-        const originalShadow = element.style.boxShadow;
+        const originalBoxShadow = element.style.boxShadow;
         element.style.boxShadow = 'none';
+        
+        const originalBtnText = downloadBtn.innerHTML;
+        downloadBtn.innerHTML = '<span>⏳</span> Generating...';
+        downloadBtn.disabled = true;
 
-        // Use html2canvas to capture the element at high quality
+        // 2. Check if library loaded correctly
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            alert('PDF library not loaded. Please check your internet connection and refresh the page.');
+            resetUI();
+            return;
+        }
+
+        // 3. Generate Canvas
         html2canvas(element, {
-            scale: 2, 
+            scale: 2,
             useCORS: true,
             allowTaint: true,
             backgroundColor: '#ffffff',
             logging: false
         }).then(canvas => {
             const imgData = canvas.toDataURL('image/jpeg', 0.98);
-            
-            // Access jsPDF from the html2pdf bundle
-            const jsPDF = window.jspdf.jsPDF || window.jspdf;
+            const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
             
             const pdfWidth = pdf.internal.pageSize.getWidth();   // 210mm
@@ -398,30 +411,31 @@
             let finalWidth = pdfWidth;
             let finalHeight = pdfWidth / ratio;
 
-            // FORCE ONE PAGE: If calculated height exceeds A4 height, scale down to fit height exactly
+            // FORCE ONE PAGE: Scale down proportionally if taller than A4
             if (finalHeight > pdfHeight) {
                 finalHeight = pdfHeight;
                 finalWidth = pdfHeight * ratio;
             }
 
-            // Center horizontally if it's narrower than the page
+            // Center horizontally
             const x = (pdfWidth - finalWidth) / 2;
-            const y = 0; // Start at the very top
-
-            pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
+            pdf.addImage(imgData, 'JPEG', x, 0, finalWidth, finalHeight);
             pdf.save(`Invoice-${invoiceNum}.pdf`);
 
-            // Restore UI elements and styles
-            element.style.boxShadow = originalShadow;
-            deleteBtns.forEach(btn => btn.style.display = '');
-            if(addBtn) addBtn.style.display = '';
         }).catch(err => {
             console.error('PDF generation failed:', err);
-            alert('PDF download failed. Please ensure you are running this file on a local server.');
-            element.style.boxShadow = originalShadow;
+            alert('PDF download failed.\n\n⚠️ IMPORTANT: If you opened this file directly by double-clicking it (file://), your browser blocks image rendering for security (CORS).\n\n✅ FIX: Open this file using a local server (e.g., VS Code "Live Server" extension, or run `python -m http.server` in the folder).');
+        }).finally(() => {
+            resetUI();
+        });
+
+        function resetUI() {
+            element.style.boxShadow = originalBoxShadow;
             deleteBtns.forEach(btn => btn.style.display = '');
             if(addBtn) addBtn.style.display = '';
-        });
+            downloadBtn.innerHTML = originalBtnText;
+            downloadBtn.disabled = false;
+        }
     }
 
     function shareEmail() {
