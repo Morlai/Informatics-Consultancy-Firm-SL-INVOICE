@@ -8,10 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice #INV-2026-0042</title>
     
-    <!-- PRIMARY: jsDelivr CDN (most reliable for GitHub Pages) -->
     <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
     
-    <!-- FALLBACK: If jsDelivr fails, try unpkg -->
     <script>
         window.addEventListener('load', function() {
             if (!window.html2pdf) {
@@ -97,7 +95,6 @@
         .btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         
-        /* PDF Status Indicator */
         .pdf-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 12px; background: #f3f4f6; color: #6b7280; white-space: nowrap; }
         
         .invoice { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
@@ -215,9 +212,8 @@
             <button class="btn btn-download" id="download-btn" onclick="downloadPDF()" disabled style="opacity: 0.5; cursor: not-allowed;">
                 <span>📥</span> Download PDF
             </button>
-            <button class="btn btn-share" onclick="shareEmail()"><span></span> Share via Email</button>
+            <button class="btn btn-share" onclick="shareEmail()"><span>📧</span> Share via Email</button>
             <button class="btn btn-print" onclick="printInvoice()"><span>🖨️</span> Print</button>
-            <!-- Status indicator showing library load state -->
             <span class="pdf-status" id="pdf-status">⏳ Loading PDF engine...</span>
         </div>
     </div>
@@ -411,9 +407,8 @@
     }
 
     function downloadPDF() {
-        // Double-check library is loaded
         if (!window.html2pdf) {
-            alert('PDF library is still loading. Please wait a moment and try again.\n\nIf the problem persists, please refresh the page.');
+            alert('PDF library is still loading. Please wait a moment and try again.');
             return;
         }
 
@@ -426,8 +421,10 @@
         deleteBtns.forEach(btn => btn.style.display = 'none');
         if(addBtn) addBtn.style.display = 'none';
         
-        const originalBoxShadow = element.style.boxShadow;
+        // CRITICAL FIX: Remove box-shadow AND force browser reflow before capture
         element.style.boxShadow = 'none';
+        element.style.margin = '0';
+        void element.offsetHeight; // Force reflow to ensure shadow is removed
         
         const originalBtnText = downloadBtn.innerHTML;
         downloadBtn.innerHTML = '<span>⏳</span> Generating...';
@@ -442,7 +439,9 @@
                 useCORS: true, 
                 allowTaint: true, 
                 logging: false, 
-                backgroundColor: '#ffffff' 
+                backgroundColor: '#ffffff',
+                // Explicitly disable shadow rendering
+                removeContainer: true
             },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
@@ -454,7 +453,9 @@
             console.error('PDF generation failed:', err);
             alert('PDF generation failed. Please try again or use the Print button and save as PDF from your browser.');
         }).finally(() => {
-            element.style.boxShadow = originalBoxShadow;
+            // Restore original styles
+            element.style.boxShadow = '';
+            element.style.margin = '';
             deleteBtns.forEach(btn => btn.style.display = '');
             if(addBtn) addBtn.style.display = '';
             downloadBtn.innerHTML = originalBtnText;
