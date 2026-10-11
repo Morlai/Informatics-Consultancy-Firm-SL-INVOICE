@@ -323,7 +323,6 @@
     let currentCurrency = '$';
     let exchangeRate = 24.5; // Fallback rate: 1 USD to SLE
 
-    // Fetch live exchange rate on load
     function initializeExchangeRate() {
         fetch('https://open.er-api.com/v6/latest/USD')
             .then(res => res.json())
@@ -331,7 +330,6 @@
                 if (data.rates && data.rates.SLE) {
                     exchangeRate = data.rates.SLE;
                 }
-                // Initialize base USD prices for existing rows
                 document.querySelectorAll('.price').forEach(el => {
                     el.dataset.usdPrice = parseNumber(el.innerText).toString();
                 });
@@ -351,7 +349,6 @@
         document.querySelectorAll('.curr-btn').forEach(btn => btn.classList.remove('active'));
         btnElement.classList.add('active');
         
-        // Update all price cells based on the new currency using stored base USD price
         document.querySelectorAll('.price').forEach(el => {
             const usdPrice = parseFloat(el.dataset.usdPrice) || 0;
             if (currentCurrency === 'Le ') {
@@ -369,19 +366,61 @@
         const invoiceNum = document.querySelector('.invoice-number').innerText.replace(/[^a-zA-Z0-9]/g, '');
         const deleteBtns = document.querySelectorAll('.delete-btn');
         const addBtn = document.querySelector('.add-row-btn');
+        
+        // Hide interactive elements for a clean PDF
         deleteBtns.forEach(btn => btn.style.display = 'none');
         if(addBtn) addBtn.style.display = 'none';
-        const opt = {
-            margin: 0, filename: `Invoice-${invoiceNum}.pdf`, image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: '#ffffff' },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
-        html2pdf().set(opt).from(element).save().then(() => {
-            deleteBtns.forEach(btn => btn.style.display = ''); if(addBtn) addBtn.style.display = '';
+        
+        // Temporarily remove shadow for cleaner capture
+        const originalShadow = element.style.boxShadow;
+        element.style.boxShadow = 'none';
+
+        // Use html2canvas to capture the element at high quality
+        html2canvas(element, {
+            scale: 2, 
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        }).then(canvas => {
+            const imgData = canvas.toDataURL('image/jpeg', 0.98);
+            
+            // Access jsPDF from the html2pdf bundle
+            const jsPDF = window.jspdf.jsPDF || window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            const pdfWidth = pdf.internal.pageSize.getWidth();   // 210mm
+            const pdfHeight = pdf.internal.pageSize.getHeight(); // 297mm
+            
+            const imgProps = pdf.getImageProperties(imgData);
+            const ratio = imgProps.width / imgProps.height;
+            
+            let finalWidth = pdfWidth;
+            let finalHeight = pdfWidth / ratio;
+
+            // FORCE ONE PAGE: If calculated height exceeds A4 height, scale down to fit height exactly
+            if (finalHeight > pdfHeight) {
+                finalHeight = pdfHeight;
+                finalWidth = pdfHeight * ratio;
+            }
+
+            // Center horizontally if it's narrower than the page
+            const x = (pdfWidth - finalWidth) / 2;
+            const y = 0; // Start at the very top
+
+            pdf.addImage(imgData, 'JPEG', x, y, finalWidth, finalHeight);
+            pdf.save(`Invoice-${invoiceNum}.pdf`);
+
+            // Restore UI elements and styles
+            element.style.boxShadow = originalShadow;
+            deleteBtns.forEach(btn => btn.style.display = '');
+            if(addBtn) addBtn.style.display = '';
         }).catch(err => {
             console.error('PDF generation failed:', err);
             alert('PDF download failed. Please ensure you are running this file on a local server.');
-            deleteBtns.forEach(btn => btn.style.display = ''); if(addBtn) addBtn.style.display = '';
+            element.style.boxShadow = originalShadow;
+            deleteBtns.forEach(btn => btn.style.display = '');
+            if(addBtn) addBtn.style.display = '';
         });
     }
 
@@ -414,7 +453,6 @@
     
     function calculateRow(row) {
         const qty = parseNumber(row.querySelector('.qty').innerText);
-        // Always calculate from the base USD price to prevent compounding rounding errors
         const usdPrice = parseFloat(row.querySelector('.price').dataset.usdPrice) || 0;
         const currentPrice = currentCurrency === 'Le ' ? usdPrice * exchangeRate : usdPrice;
         const amount = qty * currentPrice;
@@ -464,7 +502,6 @@
         calculateTotals(); 
     }
 
-    // Enhanced input listener to update base USD price when user edits a price cell
     document.getElementById('invoiceItems').addEventListener('input', function(e) {
         if (e.target.classList.contains('price')) {
             const newVal = parseNumber(e.target.innerText);
@@ -488,7 +525,6 @@
         });
     });
 
-    // Initialize exchange rate and totals on page load
     initializeExchangeRate();
 </script>
 </body>
