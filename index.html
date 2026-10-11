@@ -22,7 +22,7 @@
                 };
                 fallbackScript.onerror = function() {
                     console.error('All CDNs failed to load html2pdf');
-                    document.getElementById('pdf-status').textContent = '⚠️ PDF library unavailable';
+                    document.getElementById('pdf-status').textContent = '️ PDF library unavailable';
                     document.getElementById('pdf-status').style.color = '#ef4444';
                 };
                 document.head.appendChild(fallbackScript);
@@ -98,6 +98,15 @@
         .pdf-status { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 12px; background: #f3f4f6; color: #6b7280; white-space: nowrap; }
         
         .invoice { width: 210mm; min-height: 297mm; margin: 0 auto; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column; }
+        
+        /* CRITICAL: Class to completely strip shadow for PDF capture */
+        .invoice.pdf-capture {
+            box-shadow: none !important;
+            margin: 0 !important;
+            border: none !important;
+            outline: none !important;
+        }
+        
         .banner-wrapper { position: relative; background: var(--gradient); flex-shrink: 0; }
         .banner-content { position: relative; z-index: 1; padding: 25px 30px 50px 30px; color: white; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
         .banner-left { flex: 1; }
@@ -418,48 +427,52 @@
         const addBtn = document.querySelector('.add-row-btn');
         const downloadBtn = document.getElementById('download-btn');
         
+        // Hide interactive elements
         deleteBtns.forEach(btn => btn.style.display = 'none');
         if(addBtn) addBtn.style.display = 'none';
         
-        // CRITICAL FIX: Remove box-shadow AND force browser reflow before capture
-        element.style.boxShadow = 'none';
-        element.style.margin = '0';
-        void element.offsetHeight; // Force reflow to ensure shadow is removed
+        // CRITICAL FIX: Add the pdf-capture class which uses !important to strip shadow
+        element.classList.add('pdf-capture');
         
         const originalBtnText = downloadBtn.innerHTML;
         downloadBtn.innerHTML = '<span>⏳</span> Generating...';
         downloadBtn.disabled = true;
 
-        const opt = {
-            margin: 0,
-            filename: `Invoice-${invoiceNum}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2, 
-                useCORS: true, 
-                allowTaint: true, 
-                logging: false, 
-                backgroundColor: '#ffffff',
-                // Explicitly disable shadow rendering
-                removeContainer: true
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
+        // Wait for the browser to apply the class before capturing
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const opt = {
+                    margin: 0,
+                    filename: `Invoice-${invoiceNum}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        allowTaint: true, 
+                        logging: false, 
+                        backgroundColor: '#ffffff',
+                        // Prevent html2canvas from adding its own shadow/outline
+                        windowWidth: element.scrollWidth,
+                        windowHeight: element.scrollHeight
+                    },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                };
 
-        html2pdf().set(opt).from(element).save().then(() => {
-            console.log('PDF generated successfully');
-        }).catch(err => {
-            console.error('PDF generation failed:', err);
-            alert('PDF generation failed. Please try again or use the Print button and save as PDF from your browser.');
-        }).finally(() => {
-            // Restore original styles
-            element.style.boxShadow = '';
-            element.style.margin = '';
-            deleteBtns.forEach(btn => btn.style.display = '');
-            if(addBtn) addBtn.style.display = '';
-            downloadBtn.innerHTML = originalBtnText;
-            downloadBtn.disabled = false;
+                html2pdf().set(opt).from(element).save().then(() => {
+                    console.log('PDF generated successfully');
+                }).catch(err => {
+                    console.error('PDF generation failed:', err);
+                    alert('PDF generation failed. Please try again or use the Print button and save as PDF from your browser.');
+                }).finally(() => {
+                    // Remove the capture class to restore shadow
+                    element.classList.remove('pdf-capture');
+                    deleteBtns.forEach(btn => btn.style.display = '');
+                    if(addBtn) addBtn.style.display = '';
+                    downloadBtn.innerHTML = originalBtnText;
+                    downloadBtn.disabled = false;
+                });
+            });
         });
     }
 
